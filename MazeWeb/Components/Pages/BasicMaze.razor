@@ -1,0 +1,51 @@
+@page "/BasicMaze"
+@using Microsoft.AspNetCore.Mvc
+@using labyrinth
+@using MermaidJS.Blazor
+
+<PageTitle>Basic Maze Visualizer</PageTitle>
+
+<h1>Enter your name</h1>
+<input @bind="userName" />
+<button @onclick="generateMaze">Generate Basic Maze</button>
+<h1>Verify Path</h1>
+<input @bind="mazePath" /> 
+<button @onclick="IsCorrectPath">Check</button>
+<p>@messageForPath</p>
+<MermaidDiagram Definition=@mazeBody />
+
+<pre>@mazeBody</pre>
+
+@code
+{
+    string mazePath;
+    string userName;
+    string messageForPath;
+    bool isCorrectPath;
+    MazeCell startLocation;
+    IEnumerable<NodeLink>? links = [];
+    string mazeBody;
+
+    void generateMaze()
+    {
+        startLocation = MazeUtilities.mazeFor(userName);
+        links = MazeExplorer.ExploreMaze(startLocation);
+        mazeBody = "graph TD\n";
+        mazeBody += string.Join("\n", links.Select(l => l.Label));
+    }
+    
+    void IsCorrectPath()
+    {
+        isCorrectPath = MazeUtilities.isPathToFreedom(startLocation, mazePath);
+        if(isCorrectPath == true)
+        {
+            messageForPath = "Correct Path";
+        }
+        else
+        {
+            messageForPath = "Incorrect Path";
+        }
+    }
+
+    
+}
